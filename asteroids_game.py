@@ -1,7 +1,15 @@
+"""
+Asteroids game implemented in pure python/numpy
+"""
+
 import numpy as np
 
 
 class AsteroidsGame:
+    """
+    Asteroids game implemented in pure python/numpy
+    """
+
     def __init__(self):
         # Configs
         self.borders = np.array((800, 800))  # Screen wraps around at borders
@@ -37,12 +45,18 @@ class AsteroidsGame:
             self.add_asteroid()
 
     def move_all(self):
+        """
+        Moves all entities
+        """
         self.object_position = (
             (np.array(self.object_position) + np.array(self.object_velocity))
             % self.borders
         ).tolist()
 
     def add_player(self, position=None):
+        """
+        Add a player
+        """
         self.object_position.append(
             position if position else np.random.rand(2) * self.borders
         )
@@ -55,6 +69,9 @@ class AsteroidsGame:
         self.player_alive.append(1)
 
     def add_asteroid(self, radius=None, position=None, velocity=None):
+        """
+        Adds an asteroid
+        """
         self.object_position.append(
             position if position else np.random.rand(2) * self.borders
         )
@@ -67,6 +84,9 @@ class AsteroidsGame:
         self.object_steps.append(0)
 
     def add_bullet(self, position, velocity):
+        """
+        Adds a bullet
+        """
         self.object_position.append(position)
         self.object_velocity.append(velocity)
         self.object_radius.append(self.bullet_radius)
@@ -75,6 +95,9 @@ class AsteroidsGame:
         self.object_steps.append(0)
 
     def remove_bullets(self):
+        """
+        Removes bullets that exceeds their lifespan
+        """
         bullet_indexes_to_remove = [
             i
             for i, t in enumerate(self.object_type)
@@ -83,6 +106,9 @@ class AsteroidsGame:
         self.remove_objects(bullet_indexes_to_remove)
 
     def remove_objects(self, indexes):
+        """
+        Removes objects by indexes
+        """
         fields = [
             "object_position",
             "object_velocity",
@@ -99,21 +125,24 @@ class AsteroidsGame:
             )
 
     def apply_actions(self, actions):
+        """
+        Applies actions
+        """
         player_object_indexes = [
             i for i, t in enumerate(self.object_type) if t == "player"
         ]
         for player_index, player_actions in enumerate(actions):
-            if self.player_alive[player_index] == False:
+            if not self.player_alive[player_index]:
                 continue
             idx = player_object_indexes[player_index]
             for action, value in player_actions.items():
-                if action == "rotate_left" and value == True:
+                if action == "rotate_left" and value:
                     self.object_rotation[idx] += self.player_rotation_speed
                     self.object_rotation[idx] %= 360
-                if action == "rotate_right" and value == True:
+                if action == "rotate_right" and value:
                     self.object_rotation[idx] -= self.player_rotation_speed
                     self.object_rotation[idx] %= 360
-                if action == "accelerate_forward" and value == True:
+                if action == "accelerate_forward" and value:
                     rot = np.radians(self.object_rotation[idx])
                     self.object_velocity[idx] += self.player_acceleration * np.array(
                         [np.sin(rot), np.cos(rot)]
@@ -123,14 +152,17 @@ class AsteroidsGame:
                         self.object_velocity[idx] = (
                             self.object_velocity[idx] / speed * self.player_max_speed
                         )
-                if action == "shoot" and value == True:
+                if action == "shoot" and value:
                     rot = np.radians(self.object_rotation[idx])
                     self.add_bullet(
                         self.object_position[idx],
                         self.bullet_speed * np.array([np.sin(rot), np.cos(rot)]),
                     )
 
-    def step(self, actions={}):
+    def step(self, actions):
+        """
+        Perform a game step
+        """
         # Check alive
         if not True:
             return
@@ -150,12 +182,14 @@ class AsteroidsGame:
         self.collide()
 
     def collide(self):
-        pass
+        """
+        Checks and apply effects of collisions
+        """
 
 
 if __name__ == "__main__":
     print("hello")
 
-    game = AsteroidsGame()
+    GAME = AsteroidsGame()
     for _ in range(5):
-        game.step()
+        GAME.step({})
