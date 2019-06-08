@@ -1,13 +1,14 @@
 """
-Asteroids game implemented in pure python/numpy
+Asteroids game
 """
 
 import numpy as np
+from scipy.spatial import distance
 
 
 class AsteroidsGame:
     """
-    Asteroids game implemented in pure python/numpy
+    Asteroids game
     """
 
     def __init__(self):
@@ -185,11 +186,18 @@ class AsteroidsGame:
         """
         Checks and apply effects of collisions
         """
+        dist = distance.cdist(self.object_position, self.object_position, "euclidean")
+        collision = ((dist - self.object_radius) <= 0) * 1
+        np.fill_diagonal(collision, 0)
+        collision = np.sum(collision, axis=1)
+        print(dist)
+        print(collision)
+        return collision
 
 
 if __name__ == "__main__":
     print("hello")
 
     GAME = AsteroidsGame()
-    for _ in range(5):
+    for _ in range(1):
         GAME.step({})
