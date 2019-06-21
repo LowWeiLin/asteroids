@@ -27,6 +27,7 @@ class AsteroidsGame:
         self.player_acceleration = 0.5
         self.player_rotation_speed = 15
         self.player_max_speed = 7
+        self.player_bullet_cooldown = 20
 
         # State
         self.steps = 0
@@ -39,6 +40,7 @@ class AsteroidsGame:
         self.object_steps = []
 
         self.player_alive = []
+        self.player_cooldown = []
 
         # Initialize
         self.add_player()
@@ -68,6 +70,7 @@ class AsteroidsGame:
         self.object_steps.append(0)
 
         self.player_alive.append(1)
+        self.player_cooldown.append(0)
 
     def add_asteroid(self, radius=None, position=None, velocity=None):
         """
@@ -154,11 +157,13 @@ class AsteroidsGame:
                             self.object_velocity[idx] / speed * self.player_max_speed
                         )
                 if action == "shoot" and value:
-                    rot = np.radians(self.object_rotation[idx])
-                    self.add_bullet(
-                        self.object_position[idx],
-                        self.bullet_speed * np.array([np.sin(rot), np.cos(rot)]),
-                    )
+                    if self.player_cooldown[player_index] == 0:
+                        rot = np.radians(self.object_rotation[idx])
+                        self.add_bullet(
+                            self.object_position[idx],
+                            self.bullet_speed * np.array([np.sin(rot), np.cos(rot)]),
+                        )
+                        self.player_cooldown[player_index] = self.player_bullet_cooldown
 
     def step(self, actions):
         """
@@ -171,6 +176,7 @@ class AsteroidsGame:
         # Step
         self.steps += 1
         self.object_steps = (np.array(self.object_steps) + 1).tolist()
+        self.player_cooldown = (np.array(self.player_cooldown) - 1).clip(0).tolist()
 
         # Apply actions
         self.apply_actions(actions)
